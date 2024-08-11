@@ -8,7 +8,7 @@ import { AppError } from '../../utils/classError.js'
 import cloudinary from './../../utils/cloudinary.js';
 import { nanoid } from "nanoid";
 import slugify from "slugify";
-import { ApiFeatures } from "../../utils/ApiFeatures.js";
+import { ApiFeatures } from "./../../utils/ApiFeatures.js";
 
 //createProduct
 export const createProduct = asyncHandler(async (req , res , next) =>{
