@@ -16,7 +16,7 @@ export const initApp = (express, app) => {
     app.use(cors())
     app.use(express.json());
     app.get("/",(req,res)=>{
-        res.staus(200).json({msg:"hello on my project"})
+        res.status(200).json({msg:"hello on my project"})
     })
 
     app.use("/users",routers.userRouter)
