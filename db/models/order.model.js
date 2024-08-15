@@ -24,7 +24,7 @@ const orderSchema=  new mongoose.Schema({
     totalPrice:{type:Number,required:true},
     address:{type:String,required:true},
     phone:{type:String,required:true},
-    paymentMethod:{type:String,required:true,enum:["carc","cash"]},
+    paymentMethod:{type:String,required:true,enum:["card","cash"]},
     status:{type:String,enum:["placed","waitPayment","delivered","onWay","cancelled","rejected"],
         default:"placed"
     },

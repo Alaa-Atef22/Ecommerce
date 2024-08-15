@@ -6,6 +6,8 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { AppError } from "../../utils/classError.js";
 import { createInvoice } from "../../utils/pdf.js";
 import { sendEmail } from "../../service/sendEmail.js";
+import { payment } from "../../utils/payment.js";
+import Stripe from "stripe";
 
 //createOrder
 export const createOrder= asyncHandler(async (req, res, next) => {
@@ -79,7 +81,6 @@ _id:product.productId},{
 await cartModel.updateOne({ user: req.user._id },{products: []})
     }
 
-
     const invoice = {
         shipping: {
 name: req.user.name,
@@ -105,9 +106,48 @@ postal_code: 94111
         ]
         )
 
+if (paymentMethod == "card"){
+    const stripe = new Stripe(process.env.stripe_secret)
+if(req.body?.coupon){
+const coupon = await stripe.coupons.create({
+    percent_off : req.body.coupon.amount,
+    duration :"once"
+})
+req.body.couponId = coupon.id
+}
+    const session = await payment({
+        stripe,
+        payment_method_types: ["card"],
+        mode: "payment",
+        customer_email: req.user.email,
+        metadata:{
+            orderId: order._id.toString()
+        },
+        success_url:`${req.protocol}://${req.headers.host}/orders/success/${order._id}`,
+        cancel_url: `${req.protocol}://${req.headers.host}/orders/cancel/${order._id}`,
+        line_items: order.products.map((product)=>{
+            return  {
+    price_data:{
+    currency: "egp",
+    product_data: {
+        name: product.title,
+    },
+                     unit_amount: product.price * 100
+    },
+    quantity: product.quantity,
+    }
+        }),
+        discounts :req.body?.coupon? [{coupon:req.body.couponId}] :[]
+    })
+
+
+    return res.status(201).json({msg:"done",url : session.url,order })
 
 
 
+
+
+}
 
 
 
