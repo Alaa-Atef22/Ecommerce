@@ -14,7 +14,13 @@ import cors from "cors"
 export const initApp = (express, app) => {
 
     app.use(cors())
-    app.use(express.json());
+    app.use((req,res,next)=>{
+        if(req.originalUrl == "/orders/webhook"){
+next()
+        }else{
+            express.json()(req,res,next)
+        }
+    });
     app.get("/",(req,res)=>{
         res.status(200).json({msg:"hello on my project"})
     })
